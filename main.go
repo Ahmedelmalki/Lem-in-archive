@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"text/template/parse"
+
+	"lemin/parse"
 )
 
 // var colony = make(map[string]parse.Room)
