@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	lemin "Lem-In/parse"
+	"lemin/parse"
 )
 
-func ParseTest(t *testing.T) {
-	colony := lemin.Parse("test.txt")
-	c := map[string]lemin.Room{
-		"0": {0, 3, 0.0, []lemin.Link{"2"}},
-		"1": {8, 3, 0.0, []lemin.Link{"3"}},
-		"2": {2, 5, 0.0, []lemin.Link{"0", "3"}},
-		"3": {4, 0, 0.0, []lemin.Link{"2", "1"}},
+func TestParse(t *testing.T) {
+	colony := parse.Parse("test.txt")
+	c := map[string]parse.Room{
+		"0": {0, 3, 0.0, []parse.Link{"2"}},
+		"1": {8, 3, 0.0, []parse.Link{"3"}},
+		"2": {2, 5, 0.0, []parse.Link{"0", "3"}},
+		"3": {4, 0, 0.0, []parse.Link{"2", "1"}},
 	}
 	if CompareMaps(c, colony) {
 		fmt.Println("Maps are equal")
@@ -26,7 +26,7 @@ func ParseTest(t *testing.T) {
 
 // CompareMaps compares two maps of rooms.
 
-func CompareMaps(map1, map2 map[string]lemin.Room) bool {
+func CompareMaps(map1, map2 map[string]parse.Room) bool {
 	// Check if lengths are the same
 	if len(map1) != len(map2) {
 		return false
