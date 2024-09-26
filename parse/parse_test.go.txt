@@ -1,0 +1,59 @@
+package parse_test
+
+import (
+	"fmt"
+	"testing"
+
+	lemin "Lem-In/parse"
+)
+
+func ParseTest(t *testing.T) {
+	colony := lemin.Parse("test.txt")
+	c := map[string]lemin.Room{
+		"0": {0, 3, 0.0, []lemin.Link{"2"}},
+		"1": {8, 3, 0.0, []lemin.Link{"3"}},
+		"2": {2, 5, 0.0, []lemin.Link{"0", "3"}},
+		"3": {4, 0, 0.0, []lemin.Link{"2", "1"}},
+	}
+	if CompareMaps(c, colony) {
+		fmt.Println("Maps are equal")
+	} else {
+		t.Fail()
+	}
+	fmt.Println(colony)
+	fmt.Println(c)
+}
+
+// CompareMaps compares two maps of rooms.
+
+func CompareMaps(map1, map2 map[string]lemin.Room) bool {
+	// Check if lengths are the same
+	if len(map1) != len(map2) {
+		return false
+	}
+
+	// Compare key-value pairs
+	for key, value1 := range map1 {
+		value2, exists := map2[key]
+		switch {
+		case !exists:
+			return false
+		case value1.X != value2.X:
+			return false
+		case value1.Y != value2.Y:
+			return false
+		case value1.Fullness != value2.Fullness:
+			return false
+		case len(value1.Links) != len(value2.Links):
+			return false
+		default:
+			for i := range value1.Links {
+				if value1.Links[i] != value2.Links[i] {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
