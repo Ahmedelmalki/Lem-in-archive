@@ -1,8 +1,8 @@
-package path_finder
+package pathing
 
 import "lemin/parse"
 
-func findAllPath(colony map[string]parse.Room, start, end string) [][]string {
+func FindAllPath(colony map[string]parse.Room, start, end string) [][]string {
 	visited := make(map[string]bool)
 	paths := make([][]string, 0)
 	backtrack(colony, start, end, visited, []string{start}, &paths)
