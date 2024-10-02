@@ -106,7 +106,6 @@ func initializeAntPositions(start string) ([ants]string, [][]string) {
 }
 
 // findMinimumFullness finds the minimum fullness value among the possible next rooms for an ant.
-// findMinimumFullness finds the minimum fullness value among the possible next rooms for an ant.
 func findMinimumFullness(c map[string]parse.Room, r parse.Room, p [][]string, currentPath []string, antIndex int, f string) float64 {
     i := float64(len(p[0]) * 100.0)
     for _, link := range r.Links {
