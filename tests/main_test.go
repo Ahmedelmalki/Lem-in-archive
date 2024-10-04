@@ -1,34 +1,32 @@
-package main_test
+package tests
 
 import (
-	"lemin/parse"
-	"lemin/pathing"
-	"os"
 	"testing"
+
+	"lemin/brain"
+	"lemin/parse"
 )
 
-var cpuProfile *os.File
+func TestInitialiseRoomFullness(t *testing.T) {
+	c := parse.Parse("../parse/test.txt")                                                                             // Setup the test data
+	p := [][]string{{"0", "2", "3", "1"}, {"0", "2", "4", "1"}, {"0", "6", "4", "1"}, {"0", "6", "4", "2", "3", "1"}} // Example input for the UpdateRoomFullness function
 
-// func TestMain(m *testing.M) {
-// 	var err error
-// 	cpuProfile, err = os.Create("cpu.prof")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer cpuProfile.Close()
+	brain.InitialiseRoomFullness(c, p)
 
-// 	pprof.StartCPUProfile(cpuProfile)
-// 	defer pprof.StopCPUProfile()
+	// Define the expected result
+	expect := map[string]float64{
+		"1": 100.0,
+		"3": 200.0,
+		"2": 300.0,
+		"6": 300.0,
+		"4": 200.0,
+	}
+	for i, j := range expect {
+		actual := c[i]
 
-// 	os.Exit(m.Run())
-// }
-
-func BenchmarkFindAllPath(b *testing.B) {
-
-	colony := parse.Parse("./parse/test.txt") // Setup
-	b.ResetTimer()                            // Start timing after setup
-
-	for i := 0; i < b.N; i++ {
-		pathing.FindAllPath(colony, "0", "1") // Benchmark the function
+		// Check if the actual result matches the expected result
+		if j != actual.Fullness {
+			t.Errorf("\n\nExpected %f, got %f\nin room :%s with c:%f", j, actual.Fullness, i, actual.Fullness)
+		}
 	}
 }
