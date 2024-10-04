@@ -29,7 +29,7 @@ func calculatePaths(c map[string]parse.Room, p [][]string) [][]string {
 
 	// Set the initial fullness of the starting room
 	c[s] = updateRoomFullnessValue(c[s], 400.0)
-	
+
 	fmt.Println(c, p, f)
 
 	// Initialize the starting positions for each ant
@@ -58,7 +58,6 @@ func calculatePaths(c map[string]parse.Room, p [][]string) [][]string {
 
 	return x
 }
-
 
 // findStartAndFinish identifies the starting and finishing rooms in the colony.
 func findStartAndFinish(c map[string]parse.Room) (string, string) {
@@ -107,36 +106,35 @@ func initializeAntPositions(start string) ([ants]string, [][]string) {
 
 // findMinimumFullness finds the minimum fullness value among the possible next rooms for an ant.
 func findMinimumFullness(c map[string]parse.Room, r parse.Room, p [][]string, currentPath []string, antIndex int, f string) float64 {
-    i := float64(len(p[0]) * 100.0)
-    for _, link := range r.Links {
-        r1 := c[string(link)]
-        if i >= r1.Fullness && check(currentPath, antIndex, string(link)) && !r1.Empty || string(link) == f {
-            i = r1.Fullness
-        }
-    }
-    return i
+	i := float64(len(p[0]) * 100.0)
+	for _, link := range r.Links {
+		r1 := c[string(link)]
+		if i >= r1.Fullness && check(currentPath, antIndex, string(link)) && !r1.Empty || string(link) == f {
+			i = r1.Fullness
+		}
+	}
+	return i
 }
 
 // moveAnt attempts to move an ant to the next room based on fullness constraints.
 func moveAnt(c map[string]parse.Room, r parse.Room, n *[ants]string, x *[][]string, minFullness float64, d int) {
-    for w, link := range r.Links {
-        r1 := c[string(link)]
+	for w, link := range r.Links {
+		r1 := c[string(link)]
 
-        if r1.Fullness == minFullness && check((*x)[d-1], d, string(link)) && !r1.Empty {  // Dereference x to access the slice
-            free(&c, n[d-1])
-            r1.Fullness += 100.0
-            r1.Empty = true
-            c[string(link)] = r1
-            n[d-1] = string(link)
-            (*x)[d-1] = append((*x)[d-1], fmt.Sprintf("L%d-%s", d, n[d-1]))  // Dereference x to append to it
-            break
-        }
-        if w == len(r.Links)-1 {
-            (*x)[d-1] = append((*x)[d-1], "")
-        }
-    }
+		if r1.Fullness == minFullness && check((*x)[d-1], d, string(link)) && !r1.Empty { // Dereference x to access the slice
+			free(&c, n[d-1])
+			r1.Fullness += 100.0
+			r1.Empty = true
+			c[string(link)] = r1
+			n[d-1] = string(link)
+			(*x)[d-1] = append((*x)[d-1], fmt.Sprintf("L%d-%s", d, n[d-1])) // Dereference x to append to it
+			break
+		}
+		if w == len(r.Links)-1 {
+			(*x)[d-1] = append((*x)[d-1], "")
+		}
+	}
 }
-
 
 // free marks a room as free and decreases its fullness.
 func free(c *map[string]parse.Room, p string) {
@@ -160,9 +158,9 @@ func check(a []string, d int, b string) bool {
 func displayResult(result [][]string) {
 	fmt.Println("\nTotal weight:", result)
 	for i := 1; i < len(result[0]); i++ {
-		fmt.Println()
 		for _, v := range result {
 			fmt.Print(v[i])
 		}
+		fmt.Println()
 	}
 }
