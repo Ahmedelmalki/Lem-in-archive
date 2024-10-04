@@ -6,6 +6,12 @@ func FindAllPath(colony map[string]parse.Room, start, end string) [][]string {
 	visited := make(map[string]bool)
 	paths := make([][]string, 0)
 	backtrack(colony, start, end, visited, []string{start}, &paths)
+	for i := 0; i < len(paths)-1; i++ {
+		if len(paths[i]) < len(paths[i+1]) {
+			paths[i], paths[i+1] = paths[i+1], paths[i]
+			i = 0
+		}
+	}
 	return paths
 }
 
