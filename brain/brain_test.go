@@ -15,18 +15,18 @@ func init() {
 
 func TestChose_next_move(t *testing.T) {
 	// TODO: add tests for Chose_next_move
-	a := brain.Colony(map[string]parse.Room{
-		"0": {0, 3, 0.0, map[string]parse.Link{}},
-        "1": {8, 3, 0.0, map[string]parse.Link{"3":true, "4":true}},
-        "2": {2, 5, 0.0, map[string]parse.Link{}},
-        "3": {4, 0, 0.0, map[string]parse.Link{}},
-        "4": {6, 0, 0.0, map[string]parse.Link{}},
-        "5": {10, 0, 0.0, map[string]parse.Link{}},
-        "6": {14, 7, 0.0, map[string]parse.Link[]
-	})
+	a = brain.Colony(
+		u := make(map[string]parse.Room)
+		u["0"]= parse.Room{X: 0, Y: 3, Fullness: 0.0, Empty: false, Links: map[string]parse.Link{"2": {P: false, R: u["2"]}, "3": {P: false, R: u["3"]}, "1": {P: false, R: u["1"]}}}
+		u["1"]= parse.Room{X: 8, Y: 3, Fullness: 0.0, Empty: false, Links: map[string]parse.Link{"3": {P: false, R: u["3"]}, "2": {P: false, R: u["2"]}, "4": {P: false, R: u["4"]}, "5": {P: false, R: u["5"]}}}
+		u["2"]= parse.Room{X: 2, Y: 5, Fullness: 0.0, Empty: false, Links: map[string]parse.Link{"0": {P: false, R: u["0"]}, "3": {P: false, R: u["3"]}, "4": {P: false, R: u["4"]}, "5": {P: false, R: u["5"]}}}
+		u["3"]= parse.Room{X: 4, Y: 0, Fullness: 0.0, Empty: false, Links: map[string]parse.Link{"2": {P: false, R: u["2"]}, "1": {P: false, R: u["1"]}, "4": {P: false, R: u["4"]}, "5": {P: false, R: u["5"]}}}
+		u["4"]= parse.Room{X: 6, Y: 0, Fullness: 0.0, Empty: false, Links: map[string]parse.Link{"2": {P: false, R: u["2"]}, "3": {P: false, R: u["3"]}, "5": {P: false, R: u["5"]}, "6": {P: false, R: u["6"]}}}
+		u["5"]= parse.Room{X: 10, Y: 0, Fullness: 0.0, Empty: false, Links: map[string]parse.Link{"1": {P: false, R: u["1"]}, "2": {P: false, R: u["2"]}, "3": {P: false, R: u["3"]}, "4": {P: false, R: u["4"]}, "6": {P: false, R: u["6"]}}}
+	)
 
-	x, y := brain.Chose_next_move(a, b, c, d, e, f)
-	t.SkipNow() // Placeholder for actual tests	
+	x, false, y := brain.Chose_next_move(a, b, c, d, e, f)
+	t.SkipNow() // Placeholder for actual tests
 }
 
 func TestMoveAnt(t *testing.T) {

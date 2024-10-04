@@ -7,19 +7,22 @@ import (
 	"lemin/parse"
 )
 
-const ants = 5
+type Colony map[string]parse.Room
+
+var ants int
 
 // calculatePaths finds the starting and finishing rooms and updates the fullness of each room based on the paths.
-func Lemin(c map[string]parse.Room, p [][]string) [][]string {
-	s, f := findStartAndFinish(c)
-
+func Lemin(colo parse.Colony, p [][]string) [][]string {
+	c := Colony(colo.Rooms)
+	s, f := colo.Strat, colo.Finish
+	ants = colo.Ants
 	// Update the fullness of the rooms based on the paths
 	InitialiseRoomFullness(c, p)
 
 	// Set the initial fullness of the starting room
 	updateRoomFullnessValue(c[s], 400.0)
 
-	fmt.Println(c, p, f)
+	// fmt.Println(c, p, f)
 
 	// Initialize the starting positions for each ant
 	n, x := initializeAntPositions(s)
@@ -34,10 +37,12 @@ func Lemin(c map[string]parse.Room, p [][]string) [][]string {
 
 			r := c[n[d-1]]
 			// Fix the call by passing f as the last argument
-			i, _ := Chose_next_move(c, r, p, x[d-1], d, f)
+			i, next := Chose_next_move(c, r, p, x[d-1], d, f)
 
 			// Move the ant to the next room
-			moveAnt(c, r, &n, &x, i, d)
+			if next != "" {
+				moveAnt(c, r, &n, &x, i, d)
+			}
 		}
 		if n[ants-1] == f {
 			break
@@ -47,25 +52,8 @@ func Lemin(c map[string]parse.Room, p [][]string) [][]string {
 	return x
 }
 
-// findStartAndFinish identifies the starting and finishing rooms in the colony.
-func findStartAndFinish(c map[string]parse.Room) (string, string) {
-	var s, f string
-	for l, r := range c {
-		if r.Fullness == 1.0 {
-			s = l
-			r.Fullness = 0.0
-			c[l] = r
-		} else if r.Fullness == 2.0 {
-			f = l
-			r.Fullness = 0.0
-			c[l] = r
-		}
-	}
-	return s, f
-}
-
 // InitialiseRoomFullness initialises the fullness of the rooms based on the paths.
-func InitialiseRoomFullness(c map[string]parse.Room, p [][]string) {
+func InitialiseRoomFullness(c Colony, p [][]string) {
 	for i := len(p) - 1; i >= 0; i-- {
 		for k, l := range p[i] {
 			r := c[l]
@@ -81,9 +69,9 @@ func updateRoomFullnessValue(r parse.Room, fullness float64) parse.Room {
 	return r
 }
 
-// initializeAntPositions sets the initial positions of the ants in the colony.
-func initializeAntPositions(start string) ([ants]string, [][]string) {
-	n := [ants]string{}
+// initializeAntPositions sets the initial positions of the ants in the Colony.
+func initializeAntPositions(start string) ([]string, [][]string) {
+	n := make([]string, ants)
 	x := make([][]string, ants)
 	for i := range n {
 		n[i] = start
@@ -93,31 +81,33 @@ func initializeAntPositions(start string) ([ants]string, [][]string) {
 }
 
 // chose_next_move finds the minimum fullness value among the possible next rooms for an ant.
-func Chose_next_move(c map[string]parse.Room, r parse.Room, p [][]string, currentPath []string, antIndex int, f string) (float64, string) {
+func Chose_next_move(c Colony, r parse.Room, p [][]string, currentPath []string, antIndex int, f string) (float64, string) {
 	i := float64(len(p[0]) * 100.0)
 	t := ""
-	for _, link := range r.Links {
-		r1 := c[string(link)]
-		if i >= r1.Fullness && check(currentPath, antIndex, string(link)) && !r1.Empty || string(link) == f {
+	for link := range r.Links {
+		r1 := c[link]
+		if i >= r1.Fullness && check(currentPath, antIndex, link) && !r1.Empty || link == f {
 			i = r1.Fullness
-			t = string(link)
+			t = link
 		}
 	}
 	return i, t
 }
 
 // moveAnt attempts to move an ant to the next room based on fullness constraints.
-func moveAnt(c map[string]parse.Room, r parse.Room, n *[ants]string, x *[][]string, minFullness float64, d int) {
-	for w, link := range r.Links {
-		r1 := c[string(link)]
+func moveAnt(c Colony, r parse.Room, n *[]string, x *[][]string, minFullness float64, d int) {
+	w := -1
+	for link := range r.Links {
+		w++
+		r1 := c[link]
 
-		if r1.Fullness == minFullness && check((*x)[d-1], d, string(link)) && !r1.Empty { // Dereference x to access the slice
-			free(&c, n[d-1])
+		if r1.Fullness == minFullness && check((*x)[d-1], d, link) && !r1.Empty { // Dereference x to access the slice
+			free(&c, (*n)[d-1])
 			r1.Fullness += 100.0
 			r1.Empty = true
-			c[string(link)] = r1
-			n[d-1] = string(link)
-			(*x)[d-1] = append((*x)[d-1], fmt.Sprintf("L%d-%s", d, n[d-1])) // Dereference x to append to it
+			c[link] = r1
+			(*n)[d-1] = link
+			(*x)[d-1] = append((*x)[d-1], fmt.Sprintf("L%d-%s", d, (*n)[d-1])) // Dereference x to append to it
 			break
 		}
 		if w == len(r.Links)-1 {
@@ -127,7 +117,7 @@ func moveAnt(c map[string]parse.Room, r parse.Room, n *[ants]string, x *[][]stri
 }
 
 // free marks a room as free and decreases its fullness.
-func free(c *map[string]parse.Room, p string) {
+func free(c *Colony, p string) {
 	r := (*c)[p]
 	r.Empty = false
 	r.Fullness -= 100.0
@@ -147,7 +137,7 @@ func check(a []string, d int, b string) bool {
 // DisplayResult outputs the results of the path calculation.
 func DisplayResult(result [][]string) {
 	fmt.Println("\nTotal weight:", result)
-	for i := 1; i < len(result[0]); i++ {
+	for i := 1; i < len(result[len(result)-1]); i++ {
 		x := []string{}
 		for _, v := range result {
 			if v[i] != "" {
