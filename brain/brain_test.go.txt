@@ -1,0 +1,13 @@
+package brain_test
+
+import (
+	"lemin/brain"
+	"testing"
+)
+
+func TestLemin(t *testing.T) {
+	paths := [][]string{
+		{"0", "2", "3", "1"}, {"0", "6", "4", "1"},
+	}
+	brain.Lemin(5, paths)
+}

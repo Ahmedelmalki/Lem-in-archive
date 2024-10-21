@@ -1,14 +1,13 @@
 package parse
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 
-	"lemin/pathing"
+	"lemin/static"
 )
 
 const (
@@ -16,30 +15,22 @@ const (
 	end   = "##end"
 )
 
-type Colony struct {
-	Rooms         map[string][]string
-	Strat, Finish string
-	Ants          int
-}
-
-func Parse(file_name string) *Colony {
+func Parse(file_name string) *static.Colony {
 	file, err := os.ReadFile(file_name)
 	if err != nil {
 		log.Fatal(err)
 	}
 	colony := make(map[string][]string)
-	data := bytes.Split(file, []byte("\n"))
+	data := strings.Split(string(file), "\n")
 	var s, f bool
 	var s1, f1 string
 	ants := 0
-	for _, line := range data {
-		var r []string
-		if string(line) == start {
+	for ln, line := range data {
+		if line == start {
 			s = true
 			continue
 		}
-		if string(line) == end {
-			colony[name] = r // Update room with new link== end {
+		if line == end {
 			f = true
 			continue
 		}
@@ -49,17 +40,19 @@ func Parse(file_name string) *Colony {
 			continue
 		}
 		if ants == 0 {
-			ants, err = strconv.Atoi(string(line))
+			ants, err = strconv.Atoi(line)
 			if err != nil {
 				log.Fatal(err)
 			}
-			if ants <= 0 {
-				fmt.Println("ERROR: invalid data format\n\nneed one or more ants ")
-				os.Exit(0)
-			}
+			continue
+		}
+		if ants <= 0 && ln != 0 {
+			fmt.Printf("ERROR: invalid data format\nProgram needs to start with value of 1 or more.\n PROBLEM AT LINE %d : %s", ln, line)
+			os.Exit(1)
 		}
 		name := ""
-		n, err := fmt.Sscanf(string(line), "%s %d %d", &name, &r.X, &r.Y)
+		i := 0
+		n, err := fmt.Sscanf(line, "%s %d %d", &name, &i, &i)
 		if err == nil && n == 3 {
 			switch {
 			case s:
@@ -71,29 +64,35 @@ func Parse(file_name string) *Colony {
 				f = false
 				break
 			}
-			colony[name] = r
+			colony[name] = []string{}
 			continue
 		}
 		// Attempt to parse links
 		n2 := ""
-		l := strings.Split(string(line), "-")
+		l := strings.Split(line, "-")
 		if len(l) != 2 {
 			continue
 		}
 		name, n2 = l[0], l[1]
 
-		// Ensure both rooms exist in the map
-		if r, exists := colony[name]; exists && !pathing.IsIn(n2, r) {
+		// Ensure both rooms exist in the map and create links
+		if r, exists := colony[name]; exists && !static.IsIn(n2, r) {
 			colony[name] = append(r, n2) // Update room with new link
+		} else if !exists {
+			fmt.Printf("ERROR: invalid data format\n\n PROBLEM AT LINE %d  room '%s' Doesn't exist : %s", ln, name, line)
+			os.Exit(1)
 		}
-		if r, exists := colony[n2]; exists && !pathing.IsIn(name, r) {
+		if r, exists := colony[n2]; exists && !static.IsIn(name, r) {
 			colony[n2] = append(r, name) // Update room with new link
+		} else if !exists {
+			fmt.Printf("ERROR: invalid data format\n\n PROBLEM AT LINE %d room '%s' Doesn't exist : %s", ln, n2, line)
+			os.Exit(1)
 		}
 	}
-	return &Colony{colony, s1, f1, ants}
+	return &static.Colony{Rooms: colony, Start: s1, Finish: f1, Ants: ants}
 }
 
-func comments(line *[]byte) {
+func comments(line *string) {
 	for i, j := range *line {
 		if j == '#' {
 			*line = (*line)[:i]

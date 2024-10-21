@@ -2,26 +2,17 @@ package pathing
 
 import (
 	"fmt"
+	"lemin/static"
 	"os"
 	"sort"
-
-	"lemin/parse"
 )
 
-var (
-	c   *parse.Colony
-	end string
-)
-
-func FindAllPath(colony *parse.Colony) [][]string {
+func FindAllPath(colony *static.Colony) [][]string {
 	visited := make(map[string]bool)
 	paths := make([][]string, 0)
-	c = colony
-	end = colony.Finish
 
 	// Start the backtracking process from the start room
-	Backtrack(colony.Strat, visited, []string{colony.Strat}, &paths)
-
+	Backtrack(colony, colony.Start, visited, []string{colony.Start}, &paths)
 	// Sort the paths based on length
 	sort.SliceStable(paths, func(i, j int) bool {
 		return len(paths[i]) < len(paths[j]) // Compare lengths of inner slices
@@ -32,20 +23,19 @@ func FindAllPath(colony *parse.Colony) [][]string {
 		fmt.Println("ERROR: invalid data format\n\nCouldn't find a path from start to fisish")
 		os.Exit(0)
 	}
-	fmt.Println(paths)
 	return RemoveRepetition(paths)
 }
 
 // Backtrack is a recursive function that explores all possible paths from the current room to the end room.
-func Backtrack(current string, visited map[string]bool, path []string, paths *[][]string) {
-	if current == end {
+func Backtrack(c *static.Colony, current string, visited map[string]bool, path []string, paths *[][]string) {
+	if current == c.Finish {
 		*paths = append(*paths, append([]string{}, path...))
 		return
 	}
 	visited[current] = true
-	for link := range (*c).Rooms[current].Links {
+	for _, link := range (*c).Rooms[current] {
 		if !visited[link] {
-			Backtrack(link, visited, append(path, link), paths) // Add the link to the path before making the recursive call
+			Backtrack(c, link, visited, append(path, link), paths) // Add the link to the path before making the recursive call
 		}
 	}
 	visited[current] = false
@@ -57,9 +47,9 @@ func RemoveRepetition(paths [][]string) [][]string {
 	for i := 0; i < len(paths); i++ {
 		c0 := []string{}
 		c1 := []int{i}
-		Diffrent(&paths[i], &c0)
+		static.Diffrent(&paths[i], &c0)
 		for i1, v := range paths {
-			if i1 != i && Diffrent(&v, &c0) {
+			if i1 != i && static.Diffrent(&v, &c0) {
 				c1 = append(c1, i1)
 			}
 		}
@@ -77,33 +67,9 @@ func RemoveRepetition(paths [][]string) [][]string {
 		}
 		return false
 	})
-	fmt.Println(gr)
 	res := [][]string{}
 	for _, i := range gr[0] {
 		res = append(res, paths[i])
 	}
-	fmt.Println(res)
 	return res
-}
-
-// Check if an element is in a slice of any comparable type
-func IsIn[T comparable](val T, all []T) bool {
-	for _, v := range all {
-		if val == v {
-			return true
-		}
-	}
-	return false
-}
-
-// Check if paths are diffrent
-// NOTE : it doesn't check the first and last elements
-func Diffrent[T comparable](a1, a2 *[]T) bool {
-	for _, v := range (*a1)[1 : len(*a1)-1] {
-		if IsIn(v, *a2) {
-			return false
-		}
-	}
-	*a2 = append(*a2, (*a1)[1:len(*a1)-1]...)
-	return true
 }

@@ -3,12 +3,10 @@ package brain
 import (
 	"fmt"
 	"strings"
-
-	"lemin/parse"
 )
 
 type (
-	Colony map[string]parse.Room
+	Colony map[string][]string
 	path   struct {
 		wait int
 		way  []string
