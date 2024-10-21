@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"lemin/brain"
@@ -9,8 +10,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: lemin <file>")
+		os.Exit(0)
+	}
 	colony := parse.Parse(os.Args[1])
 	paths := pathing.FindAllPath(colony)
-	result := brain.Lemin(colony.Ants, paths)
-	brain.DisplayResult(result)
+	brain.Lemin(colony.Ants, paths)
 }

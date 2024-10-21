@@ -32,7 +32,7 @@ func FindAllPath(colony *parse.Colony) [][]string {
 		fmt.Println("ERROR: invalid data format\n\nCouldn't find a path from start to fisish")
 		os.Exit(0)
 	}
-
+	fmt.Println(paths)
 	return RemoveRepetition(paths)
 }
 
@@ -77,15 +77,17 @@ func RemoveRepetition(paths [][]string) [][]string {
 		}
 		return false
 	})
+	fmt.Println(gr)
 	res := [][]string{}
 	for _, i := range gr[0] {
 		res = append(res, paths[i])
 	}
+	fmt.Println(res)
 	return res
 }
 
 // Check if an element is in a slice of any comparable type
-func isIn[T comparable](val T, all []T) bool {
+func IsIn[T comparable](val T, all []T) bool {
 	for _, v := range all {
 		if val == v {
 			return true
@@ -98,7 +100,7 @@ func isIn[T comparable](val T, all []T) bool {
 // NOTE : it doesn't check the first and last elements
 func Diffrent[T comparable](a1, a2 *[]T) bool {
 	for _, v := range (*a1)[1 : len(*a1)-1] {
-		if isIn(v, *a2) {
+		if IsIn(v, *a2) {
 			return false
 		}
 	}

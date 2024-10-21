@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"lemin/pathing"
 )
 
 const (
@@ -14,18 +16,8 @@ const (
 	end   = "##end"
 )
 
-type Room struct {
-	X, Y  int
-	Links map[string]Link
-}
-
-type Link struct {
-	P bool
-	R Room
-}
-
 type Colony struct {
-	Rooms         map[string]Room
+	Rooms         map[string][]string
 	Strat, Finish string
 	Ants          int
 }
@@ -35,19 +27,19 @@ func Parse(file_name string) *Colony {
 	if err != nil {
 		log.Fatal(err)
 	}
-	colony := make(map[string]Room)
+	colony := make(map[string][]string)
 	data := bytes.Split(file, []byte("\n"))
 	var s, f bool
 	var s1, f1 string
 	ants := 0
 	for _, line := range data {
-		var r Room
-		r.Links = make(map[string]Link)
+		var r []string
 		if string(line) == start {
 			s = true
 			continue
 		}
 		if string(line) == end {
+			colony[name] = r // Update room with new link== end {
 			f = true
 			continue
 		}
@@ -89,19 +81,13 @@ func Parse(file_name string) *Colony {
 			continue
 		}
 		name, n2 = l[0], l[1]
-		n = len(l)
-		if n != 2 {
-			continue
-		}
 
 		// Ensure both rooms exist in the map
-		if r, exists := colony[name]; exists {
-			r.Links[n2] = Link{P: false, R: (colony[n2])}
-			colony[name] = r // Update room with new link
+		if r, exists := colony[name]; exists && !pathing.IsIn(n2, r) {
+			colony[name] = append(r, n2) // Update room with new link
 		}
-		if r, exists := colony[n2]; exists {
-			r.Links[name] = Link{P: false, R: (colony[name])}
-			colony[n2] = r // Update room with new link
+		if r, exists := colony[n2]; exists && !pathing.IsIn(name, r) {
+			colony[n2] = append(r, name) // Update room with new link
 		}
 	}
 	return &Colony{colony, s1, f1, ants}

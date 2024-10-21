@@ -16,7 +16,7 @@ type (
 )
 
 // Moves the ants trought the given paths.
-func Lemin(ants int, paths [][]string) [][]string {
+func Lemin(ants int, paths [][]string) {
 	x := make([][]string, ants)
 	p1 := make([]path, len(paths))
 	for i, v := range paths {
@@ -39,7 +39,8 @@ func Lemin(ants int, paths [][]string) [][]string {
 		}
 		p1[curr].wait += 1
 	}
-	return x
+	fmt.Println(x)
+	DisplayResult(x)
 }
 
 // DisplayResult outputs the results of the path calculation.
