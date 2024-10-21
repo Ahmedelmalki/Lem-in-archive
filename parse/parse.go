@@ -15,10 +15,8 @@ const (
 )
 
 type Room struct {
-	X, Y     int
-	Fullness float64
-	Empty    bool
-	Links    map[string]Link
+	X, Y  int
+	Links map[string]Link
 }
 
 type Link struct {
@@ -32,7 +30,7 @@ type Colony struct {
 	Ants          int
 }
 
-func Parse(file_name string) Colony {
+func Parse(file_name string) *Colony {
 	file, err := os.ReadFile(file_name)
 	if err != nil {
 		log.Fatal(err)
@@ -63,18 +61,20 @@ func Parse(file_name string) Colony {
 			if err != nil {
 				log.Fatal(err)
 			}
+			if ants <= 0 {
+				fmt.Println("ERROR: invalid data format\n\nneed one or more ants ")
+				os.Exit(0)
+			}
 		}
 		name := ""
 		n, err := fmt.Sscanf(string(line), "%s %d %d", &name, &r.X, &r.Y)
 		if err == nil && n == 3 {
 			switch {
 			case s:
-				r.Fullness = 1.0
 				s1 = name
 				s = false
 				break
 			case f:
-				r.Fullness = 2.0
 				f1 = name
 				f = false
 				break
@@ -104,8 +104,7 @@ func Parse(file_name string) Colony {
 			colony[n2] = r // Update room with new link
 		}
 	}
-	// fmt.Println("azer", ants)
-	return Colony{colony, s1, f1, ants}
+	return &Colony{colony, s1, f1, ants}
 }
 
 func comments(line *[]byte) {

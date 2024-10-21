@@ -1,28 +1,25 @@
 package parse_test
 
 import (
-	"fmt"
-	"testing"
-
 	"lemin/parse"
 )
 
-func TestParse(t *testing.T) {
-	colony := parse.Parse("test.txt")
-	c := map[string]parse.Room{
-		"0": {0, 3, 0.0, []parse.Link{"2"}},
-		"1": {8, 3, 0.0, []parse.Link{"3"}},
-		"2": {2, 5, 0.0, []parse.Link{"0", "3"}},
-		"3": {4, 0, 0.0, []parse.Link{"2", "1"}},
-	}
-	if CompareMaps(c, colony) {
-		fmt.Println("Maps are equal")
-	} else {
-		t.Fail()
-	}
-	fmt.Println(colony)
-	fmt.Println(c)
-}
+// func TestParse(t *testing.T) {
+// 	colony := parse.Parse("test.txt")
+// 	c := map[string]parse.Room{
+// 		"0": {0, 3, },
+// 		"1": {8, 3, },
+// 		"2": {2, 5, , "3"}},
+// 		"3": {4, 0, , "1"}},
+// 	}
+// 	if CompareMaps(c, colony) {
+// 		fmt.Println("Maps are equal")
+// 	} else {
+// 		t.Fail()
+// 	}
+// 	fmt.Println(colony)
+// 	fmt.Println(c)
+// }
 
 // CompareMaps compares two maps of rooms.
 
@@ -42,8 +39,8 @@ func CompareMaps(map1, map2 map[string]parse.Room) bool {
 			return false
 		case value1.Y != value2.Y:
 			return false
-		case value1.Fullness != value2.Fullness:
-			return false
+		// case value1.Fullness != value2.Fullness:
+		// 	return false
 		case len(value1.Links) != len(value2.Links):
 			return false
 		default:

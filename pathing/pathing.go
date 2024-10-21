@@ -1,57 +1,70 @@
 package pathing
 
 import (
+	"fmt"
+	"os"
 	"sort"
 
 	"lemin/parse"
 )
 
-func FindAllPath(colony parse.Colony) [][]string {
+var (
+	c   *parse.Colony
+	end string
+)
+
+func FindAllPath(colony *parse.Colony) [][]string {
 	visited := make(map[string]bool)
 	paths := make([][]string, 0)
-	backtrack(colony, colony.Strat, colony.Finish, visited, []string{colony.Strat}, &paths)
-	// fmt.Println(paths)
+	c = colony
+	end = colony.Finish
+
+	// Start the backtracking process from the start room
+	Backtrack(colony.Strat, visited, []string{colony.Strat}, &paths)
+
+	// Sort the paths based on length
 	sort.SliceStable(paths, func(i, j int) bool {
 		return len(paths[i]) < len(paths[j]) // Compare lengths of inner slices
 	})
-	// fmt.Println(paths)
-	return Wcov(paths)
-	// return nil
+
+	// Handle the case where no paths are found
+	if len(paths) == 0 {
+		fmt.Println("ERROR: invalid data format\n\nCouldn't find a path from start to fisish")
+		os.Exit(0)
+	}
+
+	return RemoveRepetition(paths)
 }
 
-func backtrack(colony parse.Colony, start, end string, visited map[string]bool, path []string, paths *[][]string) {
-	if start == end {
+// Backtrack is a recursive function that explores all possible paths from the current room to the end room.
+func Backtrack(current string, visited map[string]bool, path []string, paths *[][]string) {
+	if current == end {
 		*paths = append(*paths, append([]string{}, path...))
 		return
 	}
-	visited[start] = true
-	for link := range colony.Rooms[start].Links {
+	visited[current] = true
+	for link := range (*c).Rooms[current].Links {
 		if !visited[link] {
-			backtrack(colony, link, end, visited, append(path, link), paths)
+			Backtrack(link, visited, append(path, link), paths) // Add the link to the path before making the recursive call
 		}
 	}
-	visited[start] = false
+	visited[current] = false
 }
 
-func Wcov(paths [][]string) [][]string {
+// RemoveRepetition removes repeated paths from the input slice of paths.
+func RemoveRepetition(paths [][]string) [][]string {
 	gr := [][]int{}
 	for i := 0; i < len(paths); i++ {
 		c0 := []string{}
-		c1 := []int{}
+		c1 := []int{i}
+		Diffrent(&paths[i], &c0)
 		for i1, v := range paths {
-			// fmt.Print("check ", i1, v)
 			if i1 != i && Diffrent(&v, &c0) {
-				// fmt.Print("pass ", i1, v)
 				c1 = append(c1, i1)
-				// res = append(res, v)
 			}
 		}
-		// fmt.Println(c0)
-		// fmt.Println("\n", i, c1, res)
 		gr = append(gr, c1)
 	}
-
-	// fmt.Printf("\ngr: \t\t%v", gr)
 	sort.Slice(gr, func(i, j int) bool {
 		if len(gr[i]) != len(gr[j]) {
 			return len(gr[i]) > len(gr[j])
@@ -68,13 +81,12 @@ func Wcov(paths [][]string) [][]string {
 	for _, i := range gr[0] {
 		res = append(res, paths[i])
 	}
-	// fmt.Printf("\n\nres :\t\t%v\ngr: \t\t%v\n\n", res, gr)
 	return res
 }
 
+// Check if an element is in a slice of any comparable type
 func isIn[T comparable](val T, all []T) bool {
 	for _, v := range all {
-		// fmt.Println("checked in", val, all)
 		if val == v {
 			return true
 		}
@@ -85,17 +97,11 @@ func isIn[T comparable](val T, all []T) bool {
 // Check if paths are diffrent
 // NOTE : it doesn't check the first and last elements
 func Diffrent[T comparable](a1, a2 *[]T) bool {
-	// fmt.Println("checkedazer          in", a1, a2)
 	for _, v := range (*a1)[1 : len(*a1)-1] {
 		if isIn(v, *a2) {
 			return false
 		}
 	}
-	// fmt.Println()
-	// fmt.Println((*a1)[1 : len(*a1)-1])
 	*a2 = append(*a2, (*a1)[1:len(*a1)-1]...)
 	return true
 }
-
-// [[0 2 3 1] [0 2 4 1] [0 6 4 1] [0 6 4 2 3 1]]
-// [[0 2 4 1] [0 2 3 1] [0 6 4 1] [0 6 4 2 3 1]]

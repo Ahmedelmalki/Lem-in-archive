@@ -26,6 +26,7 @@ func TestDiffrent(t *testing.T) {
 		{g: false, d: [2][]string{{"0", "6", "4", "1"}, {"0", "2", "4", "1"}}},
 		{g: true, d: [2][]string{{"0", "6", "4", "1"}, {"0", "2", "456", "1"}}},
 		{g: true, d: [2][]string{{"0", "4", "3", "1"}, {"0", "6", "6", "1"}}},
+		{g: false, d: [2][]string{{"0", "azer", "1"}, {"0", "azer", "1"}}},
 	}
 	for i, test := range tests {
 		if pathing.Diffrent(&test.d[0], &test.d[1]) != test.g {
@@ -58,7 +59,7 @@ func TestWcov(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		res := pathing.Wcov(test.d)
+		res := pathing.RemoveRepetition(test.d)
 		if fmt.Sprint(res) != fmt.Sprint(test.g) {
 			t.Logf("failed test nbr:%d with output :%v", i, res)
 			t.Fail()

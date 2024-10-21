@@ -11,8 +11,6 @@ import (
 func main() {
 	colony := parse.Parse(os.Args[1])
 	paths := pathing.FindAllPath(colony)
-	// fmt.Println("Shortest path:", paths)
-	result := brain.Lemin(colony, paths)
-	// fmt.Println("\nFinal room fullness:", result)
+	result := brain.Lemin(colony.Ants, paths)
 	brain.DisplayResult(result)
 }
