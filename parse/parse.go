@@ -104,7 +104,7 @@ func Parse(file_name string) Colony {
 			colony[n2] = r // Update room with new link
 		}
 	}
-	fmt.Println("azer", ants)
+	// fmt.Println("azer", ants)
 	return Colony{colony, s1, f1, ants}
 }
 
