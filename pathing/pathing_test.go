@@ -71,11 +71,7 @@ func TestBacktrack(t *testing.T) {
 		Start:  "0",
 		Finish: "1",
 	}
-	p := [][]string{}
-	v := make(map[string]bool)
-	v["0"] = true
-	p1 := []string{c.Start}
-	pathing.Backtrack(&c, c.Start, v, p1, &p)
+	p := pathing.Backtrack(&c)
 	good := [][]string{
 		{"0", "2", "3", "1"},
 		{"0", "2", "4", "1"},
@@ -83,8 +79,9 @@ func TestBacktrack(t *testing.T) {
 		{"0", "6", "4", "2", "3", "1"},
 	}
 	if len(p) != len(good) {
-		t.Error("wrong number of paths")
+		t.Errorf("wrong number of paths\npaths : %v\nwant  :%v\n", p, good)
 		t.Fail()
+		return
 	}
 	for i := range p {
 		if fmt.Sprint(p[i]) != fmt.Sprint(good[i]) {
