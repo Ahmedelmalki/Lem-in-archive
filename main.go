@@ -15,6 +15,6 @@ func main() {
 		os.Exit(0)
 	}
 	colony := parse.Parse(os.Args[1])
-	paths := pathing.FindAllPath(colony)
+	paths := pathing.FindAllPaths(colony)
 	brain.Lemin(colony.Ants, paths)
 }

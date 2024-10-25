@@ -21,7 +21,7 @@ func TestFindAllPath(t *testing.T) {
 		Start:  "0",
 		Finish: "1",
 	}
-	res := pathing.FindAllPath(&c)
+	res := pathing.FindAllPaths(&c)
 	if fmt.Sprint(res) != fmt.Sprint([][]string{{"0", "2", "3", "1"}, {"0", "6", "4", "1"}}) {
 		t.Fail()
 	}
