@@ -71,7 +71,7 @@ func TestBacktrack(t *testing.T) {
 		Start:  "0",
 		Finish: "1",
 	}
-	p := pathing.Backtrack(&c)
+	p := pathing.BFS(&c)
 	good := [][]string{
 		{"0", "2", "3", "1"},
 		{"0", "2", "4", "1"},
